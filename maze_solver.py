@@ -170,21 +170,46 @@ class Maze:
             for cell in column:
                 cell.visited = False
 
+    def solve(self):
+        return self._solve_r(0, 0)
+
+    def _solve_r(self, i, j):
+        self._animate()
+        self._cells[i][j].visited = True
+
+        # Check if we are at the end cell
+        if i == self.num_cols - 1 and j == self.num_rows - 1:
+            return True
+
+        # Directions: left, right, up, down
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        for di, dj in directions:
+            ni, nj = i + di, j + dj
+
+            if 0 <= ni < self.num_cols and 0 <= nj < self.num_rows:
+                if not self._cells[ni][nj].visited:
+                    if (di == -1 and not self._cells[i][j].has_left_wall) or \
+                       (di == 1 and not self._cells[i][j].has_right_wall) or \
+                       (dj == -1 and not self._cells[i][j].has_top_wall) or \
+                       (dj == 1 and not self._cells[i][j].has_bottom_wall):
+
+                        self._cells[i][j].draw_move(self._cells[ni][nj])
+
+                        if self._solve_r(ni, nj):
+                            return True
+
+                        self._cells[i][j].draw_move(self._cells[ni][nj], undo=True)
+
+        return False
+
 def main():
     win = Window(800, 600)
-    
-    # Test drawing cells
-    cell1 = Cell(50, 50, 100, 100, win)
-    cell1.draw()
-
-    cell2 = Cell(150, 50, 200, 100, win)
-    cell2.has_right_wall = False
-    cell2.draw()
-
-    cell3 = Cell(250, 50, 300, 100, win)
-    cell3.has_bottom_wall = False
-    cell3.draw()
-
+    maze = Maze(0, 0, 10, 10, 40, 40, win, seed=0)
+    maze._break_entrance_and_exit()
+    maze._break_walls_r(0, 0)
+    maze._reset_cells_visited()
+    maze.solve()
     win.wait_for_close()
 
 if __name__ == "__main__":
