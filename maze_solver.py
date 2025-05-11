@@ -43,7 +43,7 @@ class Window:
         line.draw(self.__canvas, fill_color)
 
 class Cell:
-    def __init__(self, x1, y1, x2, y2, win):
+    def __init__(self, x1, y1, x2, y2, win=None):
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -55,25 +55,27 @@ class Cell:
         self._win = win
 
     def draw(self):
-        if self.has_left_wall:
-            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "black")
-        if self.has_right_wall:
-            self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "black")
-        if self.has_top_wall:
-            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "black")
-        if self.has_bottom_wall:
-            self._win.draw_line(Line(Point(self._x1, self._y2), Point(self._x2, self._y2)), "black")
+        if self._win is not None:
+            if self.has_left_wall:
+                self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "black")
+            if self.has_right_wall:
+                self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "black")
+            if self.has_top_wall:
+                self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "black")
+            if self.has_bottom_wall:
+                self._win.draw_line(Line(Point(self._x1, self._y2), Point(self._x2, self._y2)), "black")
 
     def draw_move(self, to_cell, undo=False):
-        color = "gray" if undo else "red"
-        start_x = (self._x1 + self._x2) // 2
-        start_y = (self._y1 + self._y2) // 2
-        end_x = (to_cell._x1 + to_cell._x2) // 2
-        end_y = (to_cell._y1 + to_cell._y2) // 2
-        self._win.draw_line(Line(Point(start_x, start_y), Point(end_x, end_y)), color)
+        if self._win is not None:
+            color = "gray" if undo else "red"
+            start_x = (self._x1 + self._x2) // 2
+            start_y = (self._y1 + self._y2) // 2
+            end_x = (to_cell._x1 + to_cell._x2) // 2
+            end_y = (to_cell._y1 + to_cell._y2) // 2
+            self._win.draw_line(Line(Point(start_x, start_y), Point(end_x, end_y)), color)
 
 class Maze:
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win):
+    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None):
         self.x1 = x1
         self.y1 = y1
         self.num_rows = num_rows
@@ -94,16 +96,18 @@ class Maze:
                 y2 = y1 + self.cell_size_y
                 cell = Cell(x1, y1, x2, y2, self.win)
                 column.append(cell)
-                self._draw_cell(i, j)
             self._cells.append(column)
+            for j in range(self.num_rows):
+                self._draw_cell(i, j)
 
     def _draw_cell(self, i, j):
         self._cells[i][j].draw()
         self._animate()
 
     def _animate(self):
-        self.win.redraw()
-        time.sleep(0.05)
+        if self.win is not None:
+            self.win.redraw()
+            time.sleep(0.05)
 
 def main():
     win = Window(800, 600)
