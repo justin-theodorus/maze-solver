@@ -58,12 +58,20 @@ class Cell:
         if self._win is not None:
             if self.has_left_wall:
                 self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "black")
+            else:
+                self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "#d9d9d9")
             if self.has_right_wall:
                 self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "black")
+            else:
+                self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "#d9d9d9")
             if self.has_top_wall:
                 self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "black")
+            else:
+                self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "#d9d9d9")
             if self.has_bottom_wall:
                 self._win.draw_line(Line(Point(self._x1, self._y2), Point(self._x2, self._y2)), "black")
+            else:
+                self._win.draw_line(Line(Point(self._x1, self._y2), Point(self._x2, self._y2)), "#d9d9d9")
 
     def draw_move(self, to_cell, undo=False):
         if self._win is not None:
@@ -108,6 +116,15 @@ class Maze:
         if self.win is not None:
             self.win.redraw()
             time.sleep(0.05)
+
+    def _break_entrance_and_exit(self):
+        # Break the entrance at the top-left cell
+        self._cells[0][0].has_top_wall = False
+        self._draw_cell(0, 0)
+
+        # Break the exit at the bottom-right cell
+        self._cells[self.num_cols - 1][self.num_rows - 1].has_bottom_wall = False
+        self._draw_cell(self.num_cols - 1, self.num_rows - 1)
 
 def main():
     win = Window(800, 600)
